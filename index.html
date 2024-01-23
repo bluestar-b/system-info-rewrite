@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test client</title>
+</head>
+<body>
+    <div id="data-container"></div>
+
+    <script>
+        const dataContainer = document.getElementById('data-container');
+
+        const socket = new WebSocket('ws://localhost:81/ws');
+
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket connection opened');
+        });
+
+        socket.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            console.log('Received data:', data);
+
+            dataContainer.innerHTML = `
+                <h2>System Information</h2>
+                <p>CPU Count: ${data.cpu_count}</p>
+                <p>CPU Percent: ${data.cpu_percent}</p>
+                <p>Total Memory: ${data.memory_info.total}</p>
+                <p>Used Memory Percent: ${data.memory_info.percent}</p>
+                <p>Total Disk Space: ${data.disk_usage.total}</p>
+                <p>Used Disk Space Percent: ${data.disk_usage.percent}</p>
+                <p>Network IO Counters: ${JSON.stringify(data.net_io_counters)}</p>
+            `;
+        });
+
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket connection closed');
+        });
+
+        socket.addEventListener('error', (event) => {
+            console.error('WebSocket connection error', event);
+        });
+    </script>
+</body>
+</html>
